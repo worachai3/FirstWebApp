@@ -5,8 +5,10 @@ let bodyParser = require('body-parser');
 let flash = require('connect-flash')
 let session = require('express-session')
 let { check, validationResult } = require('express-validator/check');
+let passport = require('passport');
+let config = require('./config/database')
 
-mongoose.connect('mongodb://localhost/nodekb');
+mongoose.connect(config.database);
 let db = mongoose.connection;
 
 // Check connection
@@ -53,6 +55,12 @@ app.use(function (req, res, next) {
   next();
 });
 
+// Passport Config
+require('./config/passport')(passport);
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Home Route
 app.get('/', function(req, res){
   Article.find({}, function(err, articles){
@@ -69,9 +77,11 @@ app.get('/', function(req, res){
 
 // Route Files
 let articles = require('./routes/article');
+let users = require('./routes/users');
 app.use('/articles', articles);
+app.use('/users', users);
 
-
+// Start Server
 app.listen('3000', function(){
   console.log('Server started on port 3000...');
 });
