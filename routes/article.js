@@ -1,22 +1,19 @@
+let express = require('express');
+let router = express.Router();
+let { check, validationResult } = require('express-validator/check');
 
-// Get Single Article
-app.get('/article/:id', function(req, res){
-  Article.findById(req.params.id, function(err, article){
-    res.render('article', {
-      article:article
-    });
+// Bring in Article Models
+let Article = require('../models/article');
+
+// Add Route
+router.get('/add/', function(req, res){
+  res.render('add_article', {
+    title: 'Add articles'
   });
 });
 
-// Add Route
-app.get('/articles/add/', function(req, res){
-  res.render('add_article', {
-    title: 'Add articles'
-    });
-});
-
 // Add Submit POST Route
-app.post('/articles/add/',
+router.post('/add/',
  [
   check('title').isLength({min:1}).trim().withMessage('Title required'),
   check('author').isLength({min:1}).trim().withMessage('Author required'),
@@ -48,7 +45,6 @@ app.post('/articles/add/',
         if(err){throw err;
         } else {
           req.flash('success', 'Article Added')
-          console.log('test');
           res.redirect('/');
         }
       });
@@ -56,7 +52,7 @@ app.post('/articles/add/',
   });
 
 // Load Edit Form
-app.get('/article/edit/:id', function(req, res){
+router.get('/edit/:id', function(req, res){
   Article.findById(req.params.id, function(err, article){
     res.render('edit_article', {
       title:'Edit Article',
@@ -66,7 +62,7 @@ app.get('/article/edit/:id', function(req, res){
 });
 
 // Update Submit POST Route
-app.post('/articles/edit/:id', function(req, res){
+router.post('/edit/:id', function(req, res){
   let article = {};
   article.title = req.body.title;
   article.author = req.body.author;
@@ -85,7 +81,7 @@ app.post('/articles/edit/:id', function(req, res){
   })
 });
 
-app.delete('/article/:id', function(req, res){
+router.delete('/:id', function(req, res){
   let query = {_id:req.params.id}
 
   Article.remove(query, function(err){
@@ -95,3 +91,14 @@ app.delete('/article/:id', function(req, res){
     res.send('Success');
   })
 });
+
+// Get Single Article
+router.get('/:id', function(req, res){
+  Article.findById(req.params.id, function(err, article){
+    res.render('article', {
+      article:article
+    });
+  });
+});
+
+module.exports = router;
