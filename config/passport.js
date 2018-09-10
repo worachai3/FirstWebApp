@@ -1,7 +1,7 @@
 let LocalStrategy = require('passport-local').Strategy;
 let User = require('../models/user');
 let config = require('../config/database');
-let bcryptjs = require('bcryptjs');
+let bcrypt = require('bcryptjs');
 
 module.exports = function(passport){
   // Local Strategy
@@ -20,7 +20,7 @@ module.exports = function(passport){
         if(isMatch){
           return done(null, user);
         } else {
-          return done(null, false, {message: 'No user found'});
+          return done(null, false, {message: 'Wrong password'});
         }
       });
     });
